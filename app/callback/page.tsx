@@ -14,28 +14,28 @@ const Callback = () => {
     const code = searchParams.get("code");
     const state = searchParams.get("state");
     if (code && state) {
-      // Aqui você pode fazer a lógica para lidar com o código de autorização
-      // e o estado retornados pelo OAuth.
-      console.log("Código:", code);
-      console.log("Estado:", state);
       const token = await getToken(code);
+
+      const sessionId = crypto.randomUUID();
+
       await fetch("/api/store-token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ access_token: token }),
+        body: JSON.stringify({ access_token: token.access_token, sessionId }),
       });
+      document.cookie = `sessionId=${sessionId}; path=/`;
 
-      router.push("/dashboard");
+      router.push("/user/dashboard");
     } else {
       console.error("Código ou estado ausente na URL.");
     }
   }
 
   useEffect(() => {
-    if (alreadyCalled.current) return; // se já foi chamado, sai
-    alreadyCalled.current = true; // marca como já executado
+    if (alreadyCalled.current) return;
+    alreadyCalled.current = true;
     handleCallback();
   }, []);
 

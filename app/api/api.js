@@ -1,5 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
+import redis from "@/lib/redis";
+import { cookies } from "next/headers";
 
 export async function getApiUrl() {
   const params = new URLSearchParams({
@@ -16,8 +18,6 @@ export async function getApiUrl() {
 }
 
 export async function getToken(authorizationCode) {
-  console.log("Authorization Code:", authorizationCode);
-
   const basicAuth = Buffer.from(
     `${process.env.NEXT_CLIENT_ID}:${process.env.NEXT_CLIENT_SECRET}`
   ).toString("base64");
@@ -49,4 +49,36 @@ export async function getToken(authorizationCode) {
   }
 
   return JSON.parse(resultText);
+}
+
+export async function getCentroCusto() {
+  const keys = await redis.keys("*");
+  console.log("🔑 Chaves no Redis:", keys);
+  const query = new URLSearchParams({
+    pagina: "1",
+    tamanho_pagina: "50",
+  }).toString();
+
+  const sessionId = cookies().get("sessionId")?.value;
+  console.log("Session ID:", sessionId);
+
+  const accessToken = await redis.get(`session:${sessionId}`);
+
+  if (!accessToken) {
+    throw new Error("Token de acesso não encontrado no Redis.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_API_URL}/centro-de-custo?${query}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  return data;
 }

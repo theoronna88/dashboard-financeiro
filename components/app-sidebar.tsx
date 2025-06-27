@@ -29,17 +29,17 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/user/dashboard",
       icon: LayoutDashboardIcon,
     },
     {
       title: "Centros de Custos",
-      url: "#",
+      url: "/user/centro-custo",
       icon: ListIcon,
     },
     {
       title: "Categorias",
-      url: "#",
+      url: "/user/categorias",
       icon: BarChartIcon,
     },
   ],

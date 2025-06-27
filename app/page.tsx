@@ -1,18 +1,10 @@
 "use client";
-// import { useEffect } from "react";
-// import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getApiUrl } from "@/app/api/api";
 
 export default function Home() {
-  /*const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/dashboard");
-  }, [router]);
-  */
-
   const handleClick = () => {
     getApiUrl();
   };

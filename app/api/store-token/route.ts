@@ -1,15 +1,14 @@
 import { cookies } from "next/headers";
-import { randomUUID } from "crypto";
 import redis from "@/lib/redis";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { access_token } = await req.json();
+  const body = await req.json();
+  const { access_token, sessionId } = body;
 
   if (!access_token) {
     return new Response("access_token ausente", { status: 400 });
   }
-
-  const sessionId = randomUUID();
 
   await redis.set(`session:${sessionId}`, access_token, "EX", 3600);
 
@@ -20,5 +19,5 @@ export async function POST(req: Request) {
     maxAge: 3600,
   });
 
-  return Response.json({ ok: true });
+  return NextResponse.json({ ok: true });
 }
