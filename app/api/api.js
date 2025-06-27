@@ -52,16 +52,15 @@ export async function getToken(authorizationCode) {
 }
 
 export async function getCentroCusto() {
-  const keys = await redis.keys("*");
-  console.log("🔑 Chaves no Redis:", keys);
   const query = new URLSearchParams({
     pagina: "1",
     tamanho_pagina: "50",
   }).toString();
 
   const sessionId = cookies().get("sessionId")?.value;
-  console.log("Session ID:", sessionId);
-
+  if (!sessionId) {
+    throw new Error("Session não encontrado nos cookies.");
+  }
   const accessToken = await redis.get(`session:${sessionId}`);
 
   if (!accessToken) {
@@ -70,6 +69,37 @@ export async function getCentroCusto() {
 
   const response = await fetch(
     `${process.env.NEXT_API_URL}/centro-de-custo?${query}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  return data;
+}
+
+export async function getCategorias() {
+  const query = new URLSearchParams({
+    pagina: "1",
+    tamanho_pagina: "50",
+  }).toString();
+
+  const sessionId = cookies().get("sessionId")?.value;
+  if (!sessionId) {
+    throw new Error("Session não encontrado nos cookies.");
+  }
+  const accessToken = await redis.get(`session:${sessionId}`);
+
+  if (!accessToken) {
+    throw new Error("Token de acesso não encontrado no Redis.");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_API_URL}/categorias?${query}`,
     {
       method: "GET",
       headers: {

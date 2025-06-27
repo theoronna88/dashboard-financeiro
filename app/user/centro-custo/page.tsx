@@ -30,9 +30,8 @@ const CentrodeCusto = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-4 md:gap-8 md:p-8">
           {listCentroCusto.map((item) => (
             <ListingCards
-              value={item.nome}
-              description={`Item: ${item.codigo}`}
-              key={item.codigo}
+              value={`${item.codigo}. ${item.nome}`}
+              key={`${item.codigo}`}
             />
           ))}
         </div>
