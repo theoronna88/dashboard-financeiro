@@ -3,9 +3,16 @@ import { getDespesas } from "@/app/api/api";
 import { useEffect, useState } from "react";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import CardsValue from "@/components/cards-value";
 
 const Despesa = () => {
   const [listDespesas, setListDespesas] = useState([]);
+  const [totais, setTotais] = useState({
+    aberto: { valor: 0 },
+    pago: { valor: 0 },
+    pendente: { valor: 0 },
+    vencido: { valor: 0 },
+  });
 
   useEffect(() => {
     if (listDespesas.length === 0) {
@@ -23,6 +30,7 @@ const Despesa = () => {
         .then((res) => {
           console.log("Despesas:", res);
           setListDespesas(res.itens);
+          setTotais(res.totais);
         })
         .catch((error) => {
           console.error("Erro ao buscar centros de custo:", error);
@@ -30,15 +38,25 @@ const Despesa = () => {
     }
   }, []);
 
-  // despesa.id
-  // despesa.descricao
-  // despesa.total
-  // despesa.dataVencimento
-  // despesa.status OVERDUE, PENDING, ACQUITTED
-
   return (
     <>
       <div className="w-full h-full p-6">
+        <div className="flex items-center justify-center w-full">
+          <div className="w-6/12 grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            {listDespesas.length > 0 && (
+              <>
+                <CardsValue status="Pago" value={totais.pago.valor} />
+                <CardsValue status="Pendente" value={totais.pendente.valor} />
+                <CardsValue status="Vencido" value={totais.vencido.valor} />
+                <CardsValue
+                  status="Em Aberto"
+                  value={totais.aberto.valor}
+                  description="Pendentes + Vencidos"
+                />
+              </>
+            )}
+          </div>
+        </div>
         <DataTable columns={columns} data={listDespesas} />
       </div>
     </>
