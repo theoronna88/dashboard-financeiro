@@ -42,6 +42,11 @@ const data = {
       url: "/user/categorias",
       icon: BarChartIcon,
     },
+    {
+      title: "Despesas",
+      url: "/user/despesa",
+      icon: ArrowUpCircleIcon,
+    },
   ],
 };
 
