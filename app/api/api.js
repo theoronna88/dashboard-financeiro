@@ -82,11 +82,23 @@ export async function getCentroCusto() {
   return data;
 }
 
-export async function getCategorias() {
-  const query = new URLSearchParams({
-    pagina: "1",
-    tamanho_pagina: "50",
-  }).toString();
+export async function getCategorias(busca) {
+  let query = null;
+  if (busca) {
+    query = new URLSearchParams({
+      pagina: "1",
+      tamanho_pagina: "50",
+      permite_apenas_filhos: "false",
+      nome: busca,
+    }).toString();
+  } else {
+    query = new URLSearchParams({
+      pagina: "1",
+      tamanho_pagina: "50",
+      permite_apenas_filhos: "false",
+    }).toString();
+  }
+  console.log("Query Params:", query);
 
   const sessionId = cookies().get("sessionId")?.value;
   if (!sessionId) {
