@@ -18,7 +18,7 @@ const Despesa = () => {
     if (listDespesas.length === 0) {
       const dataVencimentoAte = "2025-12-31";
       const dataVencimentoDe = "2024-01-01";
-      const categorias = ["1b2e8e14-698a-4e42-a390-ddbf6fd0b3f5"];
+      const categorias: never[] = [];
       const centrosDeCusto: never[] = [];
 
       getDespesas(
