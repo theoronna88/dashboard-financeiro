@@ -77,8 +77,15 @@ export default function Page() {
           });
 
         cat.despesas = despesaCategoria;
+        // Calcula o total somando o campo 'total' de cada despesa, se existir, senão usa 'valor'
         cat.total = despesaCategoria.reduce(
-          (acc, despesa) => acc + despesa.valor,
+          (acc, despesa) =>
+            acc +
+            (typeof despesa.total === "number"
+              ? despesa.total
+              : typeof despesa.valor === "number"
+              ? despesa.valor
+              : 0),
           0
         );
       }
