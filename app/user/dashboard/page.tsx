@@ -5,19 +5,48 @@ import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 
 import data from "./data.json";
-import DatePicker from "@/components/date-picker";
+// import DatePicker from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { getCategorias, getCentroCusto, getDespesas } from "@/app/api/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import YearVsYear from "@/components/year-vs-year";
+import { Despesa } from "../despesa/columns";
+// import LoadingComsefaz from "@/components/comsefaz-loading";
 
 export default function Page() {
-  const [inicio, setInicio] = useState<Date | null>(null);
-  const [termino, setTermino] = useState<Date | null>(null);
-  const [openInicio, setOpenInicio] = useState(false);
-  const [openTermino, setOpenTermino] = useState(false);
-  const [centrosDeCusto, setCentrosDeCusto] = useState<>([]);
-  const [categorias, setCategorias] = useState([]);
+  // const [inicio, setInicio] = useState<Date | null>(null);
+  // const [termino, setTermino] = useState<Date | null>(null);
+  // const [openInicio, setOpenInicio] = useState(false);
+  // const [openTermino, setOpenTermino] = useState(false);
+  interface Categoria {
+    id: number;
+    nome: string;
+    despesas?: [];
+    despesasPrev?: [];
+    total?: number;
+    totalPrev?: number;
+  }
+
+  interface CentroCusto {
+    id: number;
+    codigo: string;
+    nome: string;
+    categorias?: Categoria[];
+  }
+
+  const [year, setYear] = useState<string>("");
+  const [centrosDeCusto, setCentrosDeCusto] = useState<CentroCusto[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     const fetchCentrosDeCusto = async () => {
@@ -46,15 +75,19 @@ export default function Page() {
   }, [loading]);
 
   async function handleOnClick() {
+    setSearching(true);
     let inicioStr = "";
     let terminoStr = "";
-    if (inicio && termino) {
-      inicioStr = inicio.toISOString().slice(0, 10);
-      terminoStr = termino.toISOString().slice(0, 10);
-      console.log("Período selecionado:", inicioStr, "até", terminoStr);
-      // Período selecionado: 2025-01-01 até 2025-07-02
+    let inicioStrPrev = "";
+    let terminoStrPrev = "";
+    if (year) {
+      // if (inicio && termino) {
+      inicioStr = `${year}-01-01`;
+      terminoStr = `${year}-12-31`;
+      inicioStrPrev = `${Number(year) - 1}-01-01`;
+      terminoStrPrev = `${Number(year) - 1}-12-31`;
     } else {
-      console.log("Selecione ambas as datas de início e término.");
+      console.log("Selecione o ano primeiro.");
       return;
     }
 
@@ -76,22 +109,35 @@ export default function Page() {
             return [];
           });
 
+        const despesaCategoriaPrev = await getDespesas(
+          inicioStrPrev,
+          terminoStrPrev,
+          [cat.id]
+        )
+          .then((res) => res.itens)
+          .catch((error) => {
+            console.error("Erro ao buscar despesas:", error);
+            return [];
+          });
+
         cat.despesas = despesaCategoria;
+        cat.despesasPrev = despesaCategoriaPrev;
         // Calcula o total somando o campo 'total' de cada despesa, se existir, senão usa 'valor'
         cat.total = despesaCategoria.reduce(
-          (acc, despesa) =>
-            acc +
-            (typeof despesa.total === "number"
-              ? despesa.total
-              : typeof despesa.valor === "number"
-              ? despesa.valor
-              : 0),
+          (acc: number, despesa: Despesa) =>
+            acc + (typeof despesa.total === "number" ? despesa.total : 0),
+          0
+        );
+        cat.totalPrev = despesaCategoriaPrev.reduce(
+          (acc: number, despesa: Despesa) =>
+            acc + (typeof despesa.total === "number" ? despesa.total : 0),
           0
         );
       }
       centrocusto.categorias = catFiltro;
     }
     setCentrosDeCusto(updatedCentros);
+    setSearching(false);
     console.log("Centros de custo atualizados:", updatedCentros);
   }
 
@@ -99,7 +145,8 @@ export default function Page() {
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-end">
+            {/*
             <DatePicker
               date={inicio}
               setDate={setInicio}
@@ -113,12 +160,37 @@ export default function Page() {
               open={openTermino}
               setOpen={setOpenTermino}
               label="Final do período:"
-            />
+            />*/}
+            {/* Dropdown de ano */}
+            <div className="px-6">
+              <Label className="block text-sm font-medium mb-1">Ano:</Label>
+              <Select onValueChange={(value) => setYear(value)}>
+                <SelectTrigger className="border rounded px-2 py-1">
+                  <SelectValue placeholder="Selecione o ano" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 5 }).map((_, idx) => {
+                    const year = (new Date().getFullYear() - idx).toString();
+                    return (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
             <Button className="w-40" variant="outline" onClick={handleOnClick}>
               <SearchIcon />
               Buscar
             </Button>
           </div>
+
+          <YearVsYear
+            centrosDeCusto={centrosDeCusto}
+            searching={searching}
+            year={year}
+          />
 
           <SectionCards />
           <div className="px-4 lg:px-6">

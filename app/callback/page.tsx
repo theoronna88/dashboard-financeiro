@@ -3,7 +3,7 @@ import { getToken } from "@/app/api/api";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import SpinnerLoading from "@/components/loading";
+import LoadingComsefaz from "@/components/comsefaz-loading";
 
 const Callback = () => {
   const searchParams = useSearchParams();
@@ -41,7 +41,7 @@ const Callback = () => {
 
   return (
     <>
-      <SpinnerLoading />
+      <LoadingComsefaz />
     </>
   );
 };
