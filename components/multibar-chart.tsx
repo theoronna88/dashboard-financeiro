@@ -30,6 +30,7 @@ interface MultiBarChartProps {
   year: string;
   prevYear: number;
   searching: boolean;
+  title: string;
 }
 
 const MultiBarChart = ({
@@ -38,6 +39,7 @@ const MultiBarChart = ({
   year,
   prevYear,
   searching,
+  title,
 }: MultiBarChartProps) => {
   return (
     <>
@@ -53,9 +55,7 @@ const MultiBarChart = ({
               <div className="">
                 {/* Título */}
                 <h3 className="text-lg font-semibold text-center my-6 text-blue-900 ">
-                  {year !== ""
-                    ? `Despesas ${year} x ${prevYear}`
-                    : "Despesas Ano x Ano"}
+                  {title}
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart

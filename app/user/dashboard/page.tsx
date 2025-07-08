@@ -8,7 +8,12 @@ import data from "./data.json";
 // import DatePicker from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
-import { getCategorias, getCentroCusto, getDespesas } from "@/app/api/api";
+import {
+  getCategorias,
+  getCentroCusto,
+  getDespesas,
+  getReceitas,
+} from "@/app/api/api";
 import {
   Select,
   SelectContent,
@@ -33,6 +38,10 @@ export default function Page() {
     despesasPrev?: [];
     total?: number;
     totalPrev?: number;
+    receitas?: [];
+    receitasPrev?: [];
+    totalReceitas?: number;
+    totalReceitasPrev?: number;
   }
 
   interface CentroCusto {
@@ -108,7 +117,6 @@ export default function Page() {
             console.error("Erro ao buscar despesas:", error);
             return [];
           });
-
         const despesaCategoriaPrev = await getDespesas(
           inicioStrPrev,
           terminoStrPrev,
@@ -133,7 +141,41 @@ export default function Page() {
             acc + (typeof despesa.total === "number" ? despesa.total : 0),
           0
         );
+
+        const receitaCategoria = await getReceitas(inicioStr, terminoStr, [
+          cat.id,
+        ])
+          .then((res) => res.itens)
+          .catch((error) => {
+            console.error("Erro ao buscar receitas:", error);
+            return [];
+          });
+        const receitaCategoriaPrev = await getReceitas(
+          inicioStrPrev,
+          terminoStrPrev,
+          [cat.id]
+        )
+          .then((res) => res.itens)
+          .catch((error) => {
+            console.error("Erro ao buscar receitas:", error);
+            return [];
+          });
+        cat.receitas = receitaCategoria;
+        cat.receitasPrev = receitaCategoriaPrev;
+
+        // Calcula o total de receitas
+        cat.totalReceitas = receitaCategoria.reduce(
+          (acc: number, receita: Despesa) =>
+            acc + (typeof receita.total === "number" ? receita.total : 0),
+          0
+        );
+        cat.totalReceitasPrev = receitaCategoriaPrev.reduce(
+          (acc: number, receita: Despesa) =>
+            acc + (typeof receita.total === "number" ? receita.total : 0),
+          0
+        );
       }
+
       centrocusto.categorias = catFiltro;
     }
     setCentrosDeCusto(updatedCentros);
@@ -186,13 +228,18 @@ export default function Page() {
             </Button>
           </div>
 
+          <SectionCards
+            centrosDeCusto={centrosDeCusto}
+            searching={searching}
+            year={year}
+          />
+
           <YearVsYear
             centrosDeCusto={centrosDeCusto}
             searching={searching}
             year={year}
           />
 
-          <SectionCards />
           <div className="px-4 lg:px-6">
             <ChartAreaInteractive />
           </div>

@@ -133,7 +133,7 @@ export async function getDespesas(
 ) {
   const queryParams = {
     pagina: "1",
-    tamanho_pagina: "100",
+    tamanho_pagina: "1000",
     data_vencimento_de: dataVencimentoDe,
     data_vencimento_ate: dataVencimentoAte,
   };
@@ -155,11 +155,59 @@ export async function getDespesas(
   const accessToken = await redis.get(`session:${sessionId}`);
 
   if (!accessToken) {
-    throw new Error("Token de acesso não encontrado no Redis.");
+    console.error("Token de acesso não encontrado no Redis.");
+    redirect("http://localhost:3000");
   }
 
   const response = await fetch(
     `${process.env.NEXT_API_URL}/financeiro/eventos-financeiros/contas-a-pagar/buscar?${query}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  return data;
+}
+
+export async function getReceitas(
+  dataVencimentoDe,
+  dataVencimentoAte,
+  categorias,
+  centrosDeCusto
+) {
+  const queryParams = {
+    pagina: "1",
+    tamanho_pagina: "1000",
+    data_vencimento_de: dataVencimentoDe,
+    data_vencimento_ate: dataVencimentoAte,
+  };
+  if (categorias && categorias.length > 0) {
+    queryParams.ids_categorias = categorias;
+  }
+  if (centrosDeCusto && centrosDeCusto.length > 0) {
+    queryParams.ids_centros_de_custo = centrosDeCusto;
+  }
+  const query = new URLSearchParams(queryParams).toString();
+  console.log("Query Params:", query);
+
+  const sessionId = cookies().get("sessionId")?.value;
+  if (!sessionId) {
+    throw new Error("Session não encontrado nos cookies.");
+  }
+  const accessToken = await redis.get(`session:${sessionId}`);
+
+  if (!accessToken) {
+    console.error("Token de acesso não encontrado no Redis.");
+    redirect("http://localhost:3000");
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_API_URL}/financeiro/eventos-financeiros/contas-a-receber/buscar?${query}`,
     {
       method: "GET",
       headers: {
