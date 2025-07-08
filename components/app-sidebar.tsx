@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   ArrowUpCircleIcon,
   BarChartIcon,
+  LandmarkIcon,
   LayoutDashboardIcon,
   ListIcon,
 } from "lucide-react";
@@ -41,6 +42,11 @@ const data = {
       title: "Categorias",
       url: "/user/categorias",
       icon: BarChartIcon,
+    },
+    {
+      title: "Orçamento de Exercício",
+      url: "/user/budget",
+      icon: LandmarkIcon,
     },
     {
       title: "Despesas",
