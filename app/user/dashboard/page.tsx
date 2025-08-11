@@ -5,7 +5,6 @@ import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 
 import data from "./data.json";
-// import DatePicker from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import {
@@ -24,13 +23,8 @@ import {
 import { Label } from "@/components/ui/label";
 import YearVsYear from "@/components/year-vs-year";
 import { Despesa } from "../despesa/columns";
-// import LoadingComsefaz from "@/components/comsefaz-loading";
 
 export default function Page() {
-  // const [inicio, setInicio] = useState<Date | null>(null);
-  // const [termino, setTermino] = useState<Date | null>(null);
-  // const [openInicio, setOpenInicio] = useState(false);
-  // const [openTermino, setOpenTermino] = useState(false);
   interface Categoria {
     id: number;
     nome: string;
@@ -188,21 +182,6 @@ export default function Page() {
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
           <div className="flex gap-3 items-end">
-            {/*
-            <DatePicker
-              date={inicio}
-              setDate={setInicio}
-              open={openInicio}
-              setOpen={setOpenInicio}
-              label="Início do período:"
-            />
-            <DatePicker
-              date={termino}
-              setDate={setTermino}
-              open={openTermino}
-              setOpen={setOpenTermino}
-              label="Final do período:"
-            />*/}
             {/* Dropdown de ano */}
             <div className="px-6">
               <Label className="block text-sm font-medium mb-1">Ano:</Label>

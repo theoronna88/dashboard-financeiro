@@ -37,3 +37,6 @@ next-env.d.ts
 
 
 .env
+/lib/generated/prisma
+
+AUTH_README.md

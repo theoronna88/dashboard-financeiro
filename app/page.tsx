@@ -1,32 +1,30 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { getApiUrl } from "@/app/api/api";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import ComsefazLoading from "@/components/comsefaz-loading";
 
 export default function Home() {
-  const handleClick = () => {
-    getApiUrl();
-  };
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (status === "loading") return; // Ainda carregando
+
+    if (session) {
+      // Se usuário está logado, redireciona para dashboard
+      router.push("/user/dashboard");
+    } else {
+      // Se não está logado, redireciona para login
+      router.push("/login");
+    }
+  }, [session, status, router]);
+
+  // Mostra loading enquanto redireciona
   return (
-    <>
-      <div className="flex h-screen w-screen items-center justify-center flex-col gap-4">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center gap-4 h-96 w-[600px]">
-            <h1 className="text-2xl font-bold text-blue-800">
-              Redirecionamento para Login
-            </h1>
-
-            <Button
-              className="text-3xl font-bold bg-blue-500 h-12 rounded-full p-8"
-              onClick={handleClick}
-            >
-              Conta Azul
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    </>
+    <div className="flex h-screen w-screen items-center justify-center">
+      <ComsefazLoading />
+    </div>
   );
 }

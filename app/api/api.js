@@ -48,6 +48,8 @@ export async function getToken(authorizationCode) {
     );
   }
 
+  console.log("Response: ", response);
+
   return JSON.parse(resultText);
 }
 
@@ -79,6 +81,30 @@ export async function getCentroCusto() {
 
   const data = await response.json();
 
+  return data;
+}
+
+export async function getPessoa() {
+  const params = new URLSearchParams({
+    pagina: "1",
+    tamanho_pagina: "1000",
+  }).toString();
+
+  const sessionId = cookies().get("sessionId")?.value;
+  if (!sessionId) {
+    throw new Error("Session não encontrado nos cookies.");
+  }
+  const accessToken = await redis.get(`session:${sessionId}`);
+  if (!accessToken) {
+    throw new Error("Token de acesso não encontrado no Redis.");
+  }
+  const response = await fetch(`${process.env.NEXT_API_URL}/pessoa?${params}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  const data = await response.json();
   return data;
 }
 
